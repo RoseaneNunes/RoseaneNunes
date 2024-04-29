@@ -1,0 +1,80 @@
+#include <iostream>
+using namespace std;
+
+const int lin = 2;
+const int col = 3;
+
+//Criando stuct tabela como duas variaveis times e pontos.
+struct tabela{
+    string times;
+    long pontos; 
+  
+
+};
+//Criando um vetor para armazenar o nome dos times.
+void ler_times(tabela t[], int lin){
+    for(int i = 0; i < lin; i++){
+        cout << "nome do time: ";
+        cin >>  t[i].times;
+    }
+}
+//Criando uma matriz para armazenar os pontos em cada rodada.
+void gerar_matriz_Copa(tabela t[],int c[lin][col],int lin, int col){  
+  for(int i = 0; i<lin ; i++){
+        for(int j = 0; j < col; j++){
+            cout << "digite 0 se for derrota, 1 se for empate e 3 se for vitoria "<< endl;
+            cout <<"na rodada "<< j+1 <<" o time "<<t[i].times<<":";
+            cin >> c[i][j];
+        }
+    }
+}
+//Soma dos pontos de cada time
+void somar_pontos(int c[lin][col], tabela pontos[],int lin, int col ){
+  int p[lin];
+  for(int i = 0 ; i < lin; i++){
+    p[i] = 0;
+    for(int j=0; j<col; j++){
+      p[i] = c[i][j] + p[i] ; 
+     }
+  pontos[i].pontos = p[i]; 
+    
+    }
+
+}
+
+//funçao para organizar a tabela do maior para o menor.
+void gerar_posicao(tabela pontos[],int lin){
+  string aux1;
+  int aux2;
+  for (int i=0; i<lin; i++){
+    for(int j=i; j<lin; j++){
+      if(pontos[j].pontos > pontos[i].pontos){
+        aux1 = pontos[j].times;
+        pontos[j].times =  pontos[i].times;
+        pontos[i].times = aux1;
+        
+        aux2 = pontos[j].pontos ;
+        pontos[j].pontos = pontos[i].pontos;
+        pontos[i].pontos = aux2;
+      } 
+    }
+  }
+}
+//funçao para imprimir a posição.
+void imprimir_posicao(tabela pontos[], int lin){
+  for (int i=0; i<lin; i++){
+    cout<<"Na "<< i+1 << " colocação esta o time " <<pontos[i].times << " com: "<<pontos[i].pontos<< " pontos" << endl;
+  }
+}
+
+int main(){
+  
+  tabela pontos[lin];
+  int c[lin][col];;
+  ler_times(pontos,lin);
+  gerar_matriz_Copa(pontos,c,lin,col);
+  somar_pontos(c,pontos,lin,col);
+  gerar_posicao(pontos,lin);
+  imprimir_posicao(pontos,lin);
+ 
+}
