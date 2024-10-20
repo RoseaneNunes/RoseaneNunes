@@ -1,0 +1,252 @@
+#include<cstdlib>
+#include <iostream>
+#include <ctime>
+using namespace std; 
+//criaççao do istruct q armazenara informaçoes do cadaatros.
+struct cadastro{
+
+    string nome;
+    int inscricao;
+    string email;
+    cadastro *prox;
+    cadastro *ant;
+    int presenca;  
+};
+//criaççao do istruct q armazenara informaçoes das atividades.
+struct atividades{
+
+    string titulo;
+    string tipo;
+    int data;
+    int hora;
+    atividades *prox;
+    atividades *ant;
+
+};
+//criação do instruct q armazenara o tam e os aportadores do descritor do cadastro.
+struct descritor2{
+
+    int tam ;
+    atividades *fim;
+    atividades *ini;
+};
+
+//criação do instruct q armazenara o tam e os aportadores do descritor do cadastro.
+struct descritor{
+
+    int tam ;
+    cadastro *fim;
+    cadastro *ini;
+};
+
+// criação da caixa do descritor ligando ele a  null.
+descritor *criar(){
+
+    descritor *novo=new descritor;
+    novo -> ini = NULL;
+    novo -> fim = NULL;
+    novo -> tam= 0;
+    return novo;
+}
+
+// criação da caixa do descritor ligando ele a  null.
+descritor2 *criar2(){
+
+    descritor2 *novo = new descritor2;
+    novo -> ini = NULL;
+    novo -> fim = NULL;
+    novo -> tam= 0;
+    return novo;
+}
+
+
+//função para adicionar cadastros a lista encadeada de cadastro.
+void add_cadastro(descritor *l,string n, string e ){
+    cadastro *novo = new cadastro ;
+    novo -> nome = n ;
+    novo -> email = e; 
+    novo -> prox = NULL;
+    novo -> ant = NULL;
+
+    if(l -> tam == 0){//condiçao caso seja a primeira inserçaõ
+        l -> ini = novo;
+        l -> fim = novo;
+        l  -> tam++;
+        novo -> inscricao ++;
+    }
+
+    else{//condição caso ja tenha outras incerçoes.
+        l->fim -> prox = novo;
+        novo -> ant = l -> fim;
+        l -> fim = novo ;
+        l -> tam++;
+    }
+
+}
+//função para adicionar atividades a lista encadeada de atividade.
+void add_atividade(descritor2 *a,string t, int data, int hora, string tp ){
+    atividades *novo = new atividades ;// criaçao de uma novo apontador para que as informaçoes serem inserido na lista
+    novo -> titulo = t;
+    novo -> tipo = tp;
+    novo -> data = data; 
+    novo -> hora = hora;
+    novo -> prox = NULL;
+    novo -> ant = NULL;
+
+    if(a -> tam == 0){//condiçao caso seja a primeira inserçaõ
+        a -> ini = novo;
+        a -> fim = novo;
+        a  -> tam++;
+    }
+
+    else{//condição caso ja tenha outras incerçoes.
+        a->fim -> prox = novo;
+        novo -> ant = a -> fim;
+        a -> fim = novo ;
+        a -> tam++;
+    }
+
+}
+
+//função para criar uma matriz dinamica e armazenar dados da frequencia dos inscritos.
+ void matriz(descritor *l, descritor2 *a, bool **m){
+    cadastro *p = l -> ini;// iniciar a busca do início da lista 
+
+    for (int i = 0; i< l ->tam; i ++){
+        atividades *at = a -> ini;// iniciar a busca do início da lista 
+
+        for (int j = 0; j < a ->tam ; j++){
+            string res = "ok";
+            while (res!= "sim" && res !="nao"){//coleta de respostas
+
+                cout << "o participante "<< p -> nome << " participou da atividade "<< at -> titulo<< endl;
+                cin >> res;
+                if(res!= "sim" && res !="nao"){
+                   cout <<" resposta invalida "<< endl;
+                }
+
+            }
+
+            if(res =="sim"){
+
+                m[i][j] = true;
+                p -> presenca ++;
+                at = at -> prox;
+            }
+            else{
+
+                m[i][j]= false;
+                at = at -> prox;
+            }
+
+        }
+
+        p = p -> prox;
+    }
+
+}
+//funçao para imprimir a matriz, mostrando os nomes das pessoas e atividade
+void imprimir_matriz(bool **m, descritor *p,descritor2 *a){
+    cadastro *l = new cadastro;// iniciar a busca do início da lista 
+    l = p -> ini;
+    atividades *at = a -> ini;// iniciar a busca do início da lista 
+    cout <<endl;
+
+    for (int i = 0 ;  i<p ->tam; i++ ){
+        
+        cout<< l -> nome<<"   ";
+        at = a ->ini;
+        for(int j = 0; j < a -> tam; j++){
+            cout<<m[i][j]<<"   ";
+            at = at ->prox; 
+        }
+
+        cout<<endl;
+        l = l->prox;
+
+    }
+}
+//funçaõ que cria um vetor q armazene os nomes das pessoas aptas para serem sorteadas, 
+//e realize um sorteio, ultilizando funçoes de duas blibliotecas,<cstdlib><ctime>, e no fim imprime o resultado do sorteio. 
+void sorteio(descritor *p, descritor2 *a) {
+    cadastro *l;
+    l = p->ini;// iniciar a busca do início da lista 
+    int numero[3];
+    bool participanteSorteado[p->tam] = {false}; // Inicialize todos como não sorteados
+    srand(time(NULL));
+
+    for (int i = 0; i < 3; i++) {
+        do {
+            numero[i] = rand() % p->tam;
+        } while (participanteSorteado[numero[i]]); // Verificar se o participante já foi sorteado
+
+        l = p->ini; // Reiniciar a busca do início da lista a cada iteração
+        for (int j = 0; j < numero[i] && l; j++) {
+            l = l->prox;
+        }
+
+        // Verificar se o cadastro cumpre o critério de presença
+        if (l && l->presenca >= 0.7 * a->tam) {
+            cout << l->nome << endl;
+            participanteSorteado[numero[i]] = true; // Marcar o participante como sorteado
+        } 
+        
+        else {
+            // Se não atender ao critério, escolher um novo número
+            i--; // Voltar uma iteração para tentar novamente
+        }
+    }
+}
+
+
+
+
+
+int main(){
+int data, hora;
+string titulo, nome, email,tipo;
+descritor *lista_p = criar();
+descritor2 *lista_a = criar2();
+string res;
+
+cout << "deseja inserir incritos: "<< endl;
+cin >> res;
+
+while (res!= "nao"){
+    cout << " digite o nome do nome do inscrito:"<<endl;
+    cin >> nome ;
+    cout << " digite o email do inscrito: "<< endl;
+    cin >> email;
+    add_cadastro(lista_p, nome, email);  
+    cout<<"deseja inserir mais incritos:"<<endl;
+    cin>> res;
+
+}
+
+cout << "deseja inserir uma atividade: "<< endl;
+cin >> res;
+
+while (res!= "nao"){
+    cout << " digite o nome do titulo da atividade:"<<endl;
+    cin >> titulo ;
+     cout << " digite o nome do tipo da atividade:"<<endl;
+    cin >> tipo ;
+    cout << " digite o horario da atividade: "<< endl;
+    cin >> hora;
+    cout << " digite a data da atividade: "<< endl;
+    cin >> data;
+    add_atividade(lista_a, titulo, data, hora, tipo);  
+    cout<<"deseja inserir mais incritos:"<<endl;
+    cin>> res;
+} 
+
+bool **mat = new bool *[lista_p -> tam];
+for( int i = 0; i < lista_p -> tam; i++ ){
+     mat[i] = new bool[lista_a -> tam];
+}
+
+matriz(lista_p, lista_a, mat);
+imprimir_matriz(mat,lista_p, lista_a);
+cout<< "resultado do sorteio:"<< endl;
+sorteio(lista_p, lista_a);
+}
