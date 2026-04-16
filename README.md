@@ -1,5 +1,6 @@
-<img src="https://i.imgur.com/pqfJ9bq.png"  />
 
+<img src="./IMAGE.svg" width="100%">
+  <br><br>
   _Linguagens e Tecnologias:_
    <br><br>
   <img src="https://i.imgur.com/THKvd7T.gif"/>
